@@ -268,6 +268,29 @@
   }
 
   /* ---------- SVG ---------- */
+  function wineFill(type,profile){
+    if(type==="Branco")return "#E4CE83";
+    if(type==="Rosé")return "#E79AA6";
+    if(type==="Espumante")return "#E8D58A";
+    if(profile==="Leve")return "#A3375A";
+    if(profile==="Intenso")return "#561129";
+    return "#7A1B3D";
+  }
+  function bottleSVG(type,profile,size){
+    size=size||104; var fill=wineFill(type,profile), sp=type==="Espumante", wd=size*0.42;
+    var gid="g"+(type+profile).replace(/[^A-Za-z]/g,"");
+    var bub = sp?'<g fill="#fff" opacity="0.55"><circle cx="30" cy="64" r="1.6"/><circle cx="35" cy="72" r="1.3"/><circle cx="27" cy="78" r="1.2"/><circle cx="33" cy="84" r="1.5"/></g>':'';
+    return '<svg class="i" width="'+wd+'" height="'+size+'" viewBox="0 0 60 160" aria-hidden="true">'+
+      '<defs><linearGradient id="'+gid+'" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="'+fill+'" stop-opacity="0.95"/><stop offset="0.5" stop-color="'+fill+'"/><stop offset="1" stop-color="'+fill+'" stop-opacity="0.78"/></linearGradient></defs>'+
+      '<rect x="23" y="2" width="14" height="11" rx="2" fill="'+(sp?"#B08A46":"#5E1730")+'"/>'+
+      '<rect x="25" y="12" width="10" height="30" fill="url(#'+gid+')"/>'+
+      '<path d="M16 56 C16 46 25 44 25 40 L35 40 C35 44 44 46 44 56 L44 150 C44 156 40 158 36 158 L24 158 C20 158 16 156 16 150 Z" fill="url(#'+gid+')" stroke="rgba(0,0,0,0.10)" stroke-width="1"/>'+
+      '<rect x="19" y="92" width="22" height="40" rx="2" fill="#FBF7F1" opacity="0.95"/>'+
+      '<rect x="19" y="100" width="22" height="2" fill="#B08A46" opacity="0.7"/>'+
+      '<rect x="22" y="108" width="16" height="2" fill="rgba(42,23,34,.10)"/>'+
+      '<rect x="22" y="113" width="12" height="2" fill="rgba(42,23,34,.10)"/>'+
+      '<rect x="20" y="60" width="3" height="80" rx="2" fill="#fff" opacity="0.18"/>'+bub+'</svg>';
+  }
   var GLASS_LIQUID={Tinto:"#7E1C3C",Branco:"#E7CE7A","Rosé":"#E79AA7",Espumante:"#ECDB8E"};
   function glassSVG(type,size){
     size=size||56; var liquid=GLASS_LIQUID[type]||"#7E1C3C", sp=type==="Espumante";
@@ -506,85 +529,61 @@
       (note?'<div class="note">'+note+'</div>':'')+'</div>'+
       '<div class="stack" style="margin-top:0">'+cards+'</div>'+bottombar(true)+'</div>';
   }
+  function dtItem(icon,label,value){
+    return '<div class="dt-item"><span class="material-symbols-outlined">'+icon+'</span>'+
+      '<div><p class="dt-item-label">'+label+'</p><p class="dt-item-value">'+esc(value||'—')+'</p></div></div>';
+  }
+  function dtTasteRow(label,value){
+    var v=Math.max(0,Math.min(5,Math.round(value||0))), dots='',i;
+    for(i=1;i<=5;i++){ dots+='<span class="dt-dot'+(i<=v?' on':'')+'"></span>'; }
+    return '<div class="dt-taste-row"><span class="dt-taste-label">'+label+'</span><div class="dt-dots">'+dots+'</div></div>';
+  }
   function viewDetails(){
     var w=state.selected.wine;
     var why=buildWhy(w,state.flow,state.food).map(function(t){return '<p>'+esc(t)+'</p>';}).join('');
     var pairs=w.pairings.map(function(p){return '<span class="pair">'+FOOD_ICON[p.foodCategory]+' '+p.foodCategory+'</span>';}).join('');
     var t=w.taste||{fruit:0,sugar:0,acidity:0,tannin:0};
+    var found=COUNTRIES.find(function(c){return c.name.toLowerCase()===w.country.toLowerCase();});
+    var flagURL='assets/imagens/bandeiras/'+(found?found.code:'br')+'.png';
+    var origin=esc(w.country)+(w.region?', '+esc(w.region):'');
+    var desc=w.profileReason||w.shortRecommendation||'';
 
-    // Technical sheet items
-    var techHTML = 
-      '<div class="tech-sheet">'+
-        '<div class="tech-item"><span class="tech-icon">🏢</span><div><div class="tech-lbl">Vinícola</div><div class="tech-val">'+esc(w.winery || '—')+'</div></div></div>'+
-        '<div class="tech-item"><span class="tech-icon">⏳</span><div><div class="tech-lbl">Amadurecimento</div><div class="tech-val">'+esc(w.maturation || '—')+'</div></div></div>'+
-        '<div class="tech-item"><span class="tech-icon">📍</span><div><div class="tech-lbl">Região</div><div class="tech-val">'+esc(w.region || '—')+'</div></div></div>'+
-        '<div class="tech-item"><span class="tech-icon">📅</span><div><div class="tech-lbl">Potencial de Guarda</div><div class="tech-val">'+esc(w.cellaring || '—')+'</div></div></div>'+
-        '<div class="tech-item"><span class="tech-icon">🍷</span><div><div class="tech-lbl">Tipo</div><div class="tech-val">'+esc(w.type || '—')+'</div></div></div>'+
-        '<div class="tech-item"><span class="tech-icon">🌡️</span><div><div class="tech-lbl">Temperatura de Serviço</div><div class="tech-val">'+esc(w.servingTemperature || '—')+'</div></div></div>'+
-        '<div class="tech-item"><span class="tech-icon">🏷️</span><div><div class="tech-lbl">Classificação</div><div class="tech-val">'+esc(w.perceivedSweetness || '—')+'</div></div></div>'+
-        '<div class="tech-item"><span class="tech-icon">📊</span><div><div class="tech-lbl">Teor Alcoólico</div><div class="tech-val">'+esc(w.alcohol || '—')+'</div></div></div>'+
-        '<div class="tech-item"><span class="tech-icon">🍇</span><div><div class="tech-lbl">Uva</div><div class="tech-val">'+esc(w.grape || '—')+'</div></div></div>'+
-        '<div class="tech-item"><span class="tech-icon">🍾</span><div><div class="tech-lbl">Volume</div><div class="tech-val">'+esc(w.volume || '—')+'</div></div></div>'+
-      '</div>';
+    var grid='<div class="dt-grid">'+
+      dtItem('liquor','Tipo',w.type)+
+      dtItem('verified','Classificação',w.perceivedSweetness)+
+      dtItem('nutrition','Uva',w.grape)+
+      dtItem('hourglass_empty','Amadurecimento',w.maturation)+
+      dtItem('thermostat','Serviço',w.servingTemperature)+
+      dtItem('percent','Álcool',w.alcohol)+
+      dtItem('wine_bar','Volume',w.volume)+
+      dtItem('calendar_month','Potencial de guarda',w.cellaring)+
+    '</div>';
 
-    // Taste meters with dots (10 dots)
-    var meterHTML = 
-      '<div class="taste-section">'+
-        '<img class="taste-glass-img" src="' + getWineGlassImg(w.type) + '" alt="' + esc(w.type) + '">'+
-        '<div class="taste-meters">'+
-          '<div class="taste-title">Sabor</div>'+
-          meterRowDots("Fruta", t.fruit)+
-          meterRowDots("Dulçor", t.sugar)+
-          meterRowDots("Acidez", t.acidity)+
-          meterRowDots("Tanino", t.tannin)+
-        '</div>'+
-      '</div>';
+    var taste='<div class="dt-taste"><h3>Perfil de Sabor</h3>'+
+      dtTasteRow('Fruta',t.fruit)+
+      dtTasteRow('Doçura',t.sugar)+
+      dtTasteRow('Acidez',t.acidity)+
+      dtTasteRow('Tanino',t.tannin)+
+    '</div>';
 
-    // Map country flag
-    var flagCode = '';
-    var foundCountry = COUNTRIES.find(function(c){return c.name.toLowerCase() === w.country.toLowerCase();});
-    if(foundCountry) {
-      flagCode = foundCountry.code;
-    } else {
-      flagCode = 'br'; // fallback
-    }
-    var flagURL = 'assets/imagens/bandeiras/' + flagCode + '.png';
-
-    return '<div class="wrap">'+
-      '<div class="details-header">'+
-        '<div style="flex:1">'+
-          '<span class="details-badge">'+esc(w.type.toUpperCase())+'</span>'+
-          '<h1 class="details-name">'+esc(w.name)+'</h1>'+
-          '<div class="details-price">'+brl(w.price)+'</div>'+
-          (w.color?'<div class="details-color">'+esc(w.color)+'</div>':'')+
-        '</div>'+
-        '<div class="details-flag-wrapper">'+
-          '<img class="details-flag" src="'+flagURL+'" alt="'+esc(w.country)+'">'+
-          '<div style="font-size:12px;font-weight:700;color:var(--inkSoft);margin-top:6px;text-align:center">'+esc(w.country.toUpperCase())+'</div>'+
-        '</div>'+
+    return '<div class="details2">'+
+      '<div class="dt-main">'+
+        '<section class="dt-image">'+bottleSVG(w.type,w.profile,340)+'</section>'+
+        '<section class="dt-content">'+
+          '<div class="dt-header">'+
+            '<div class="dt-title-row"><h1 class="dt-name">'+esc(w.name)+'</h1><div class="dt-price">'+brl(w.price)+'</div></div>'+
+            '<div class="dt-origin"><span class="dt-flag"><img src="'+flagURL+'" alt="'+esc(w.country)+'"></span><span>'+origin+'</span></div>'+
+            (w.winery?'<p class="dt-winery">'+esc(w.winery)+'</p>':'')+
+            (desc?'<p class="dt-desc">'+esc(desc)+'</p>':'')+
+          '</div>'+
+          '<hr class="dt-divider">'+
+          grid+
+          taste+
+          (pairs?'<div class="dt-pairs-block">'+eyebrow('Harmoniza bem com')+'<div class="pairs">'+pairs+'</div></div>':'')+
+          '<div class="why"><h4>Por que recomendamos</h4>'+why+'</div>'+
+        '</section>'+
       '</div>'+
-      '<h3 class="section-title">Ficha Técnica</h3>'+
-      techHTML +
-      meterHTML +
-      (pairs?'<div style="margin-top:28px">'+eyebrow('Harmoniza bem com')+'<div class="pairs">'+pairs+'</div></div>':'')+
-      '<div class="why"><h4>Por que recomendamos</h4>'+why+'</div>'+
       bottombar(true)+
-      '</div>';
-  }
-
-  function meterRowDots(label, value) {
-    var activeDots = Math.round(value * 2); // Scale 5 points to 10 points
-    var dots = '';
-    for (var i = 1; i <= 10; i++) {
-      if (i <= activeDots) {
-        dots += '<span class="dot active"></span>';
-      } else {
-        dots += '<span class="dot"></span>';
-      }
-    }
-    return '<div class="taste-meter-row">'+
-      '<span class="label">'+label+'</span>'+
-      '<div class="dots-container">'+dots+'</div>'+
     '</div>';
   }
   function listToPt(arr){
