@@ -1,7 +1,7 @@
 # Adega do Mercado — Recomendação de Vinhos
 
-Aplicativo de quiosque/totem (uso em **tablet**) para recomendar vinhos da
-**Planos Supermercados**. Funciona 100% offline, sem build e sem servidor —
+Aplicativo de quiosque/totem (uso em **tablet**) para recomendar vinhos.
+Funciona 100% offline, sem build e sem servidor —
 basta abrir o `index.html` num navegador.
 
 ## Como usar
