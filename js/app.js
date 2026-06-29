@@ -251,9 +251,8 @@
       scored=active.map(function(w){var r=scoreFood(w,state.food); return {wine:w,score:r.score,pct:r.pct};});
     }
     scored.sort(function(x,y){return (y.score-x.score)||(x.wine.price-y.wine.price);});
-    var items=scored.slice(0,3);
-    var weak=!neutral&&((items[0]?items[0].pct:0)<WEAK_THRESHOLD);
-    return {items:items,neutral:neutral,weak:weak,empty:false};
+    var weak=!neutral&&((scored[0]?scored[0].pct:0)<WEAK_THRESHOLD);
+    return {items:scored,neutral:neutral,weak:weak,empty:false};
   }
   function recommendCountry(){
     var active=state.wines.filter(function(x){return x.isActive;});
@@ -265,7 +264,7 @@
       return {wine:w,score:s,pct:0};
     });
     scored.sort(function(a,b){return (b.score-a.score)||(a.wine.price-b.wine.price);});
-    return {items:scored.slice(0,3),neutral:false,weak:false,empty:false,noCountry:false};
+    return {items:scored,neutral:false,weak:false,empty:false,noCountry:false};
   }
 
   /* ---------- SVG ---------- */
@@ -309,13 +308,6 @@
     var p={home:'M3 11l9-8 9 8M5 10v10h14V10',back:'M19 12H5M12 19l-7-7 7-7',chev:'M6 9l6 6 6-6',
       plus:'M12 5v14M5 12h14',x:'M18 6L6 18M6 6l12 12',check:'M20 6L9 17l-5-5'}[name];
     return '<svg class="i" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="'+p+'"/></svg>';
-  }
-  function getWineGlassImg(type) {
-    var t = (type || '').toLowerCase();
-    if(t.indexOf('branco') !== -1) return 'assets/imagens/tacas/taca-branco.jpg';
-    if(t.indexOf('rosé') !== -1 || t.indexOf('rose') !== -1) return 'assets/imagens/tacas/taca-rose.jpg';
-    if(t.indexOf('espumante') !== -1) return 'assets/imagens/tacas/taca-espumante.jpg';
-    return 'assets/imagens/tacas/taca-tinto.jpg';
   }
 
   /* ---------- Componentes (strings) ---------- */
@@ -514,21 +506,32 @@
     var title=r.weak?"As opções mais próximas da sua escolha":
               state.flow==="country"?"Vinhos de "+esc(state.selectedCountry):
               "Encontramos vinhos que combinam com sua escolha";
-    var cards=r.items.map(function(it,i){
+    var rows=r.items.map(function(it,i){
       var w=it.wine, top=(i===0&&!r.neutral&&!r.weak&&state.flow!=="country");
-      return '<button class="winecard'+(top?' top':'')+'" data-action="openWine" data-id="'+w.id+'">'+
-        '<img class="winecard-glass-img" src="' + getWineGlassImg(w.type) + '" alt="' + esc(w.name) + '">'+
-        '<span style="flex:1">'+(top?'<span class="tag">Mais recomendado</span>':'')+
-          '<span class="nm" style="display:block">'+esc(w.name)+'</span>'+
-          '<span class="meta"><b>'+brl(w.price)+'</b><span style="color:var(--lineStrong)">&bull;</span><span>'+w.type+'</span></span>'+
-          '<span class="ph" style="display:block">'+esc(w.shortRecommendation)+'</span></span>'+
-        '<span style="color:var(--inkSoft);transform:rotate(-90deg)">'+ic('chev')+'</span></button>';
+      var cc=COUNTRIES.find(function(c){return c.name.toLowerCase()===w.country.toLowerCase();});
+      var loc=esc(w.region||w.country)+(cc?', '+cc.code.toUpperCase():'');
+      return '<button class="resrow'+(top?' top':'')+'" data-action="openWine" data-id="'+w.id+'">'+
+        '<span class="resrow-img">'+bottleSVG(w.type,w.profile,58)+'</span>'+
+        '<span class="resrow-info">'+
+          '<span class="resrow-head">'+
+            '<span class="resrow-loc">'+loc+'</span>'+
+            '<span class="resrow-name">'+esc(w.name)+'</span>'+
+            (top?'<span class="resrow-top">Mais recomendado</span>':'')+
+          '</span>'+
+          '<span class="resrow-grape">'+esc(w.grape||w.type)+'</span>'+
+          (w.shortRecommendation?'<span class="resrow-desc">'+esc(w.shortRecommendation)+'</span>':'')+
+        '</span>'+
+        '<span class="resrow-price">'+brl(w.price)+'</span>'+
+      '</button>';
     }).join('');
-    return '<div class="wrap"><div style="margin-bottom:22px">'+eyebrow('Recomendação')+
-      '<h1 class="s">'+title+'</h1>'+
-      '<p class="sub" style="margin-top:8px;font-size:15px">Toque em um vinho para ver mais detalhes.</p>'+
-      (note?'<div class="note">'+note+'</div>':'')+'</div>'+
-      '<div class="stack" style="margin-top:0">'+cards+'</div>'+bottombar(true)+'</div>';
+    var n=r.items.length;
+    return '<div class="results2">'+
+      '<div class="reshead"><h2 class="reshead-title">'+title+'</h2>'+
+        '<span class="reshead-count">'+n+(n===1?' vinho':' vinhos')+'</span></div>'+
+      (note?'<p class="reshead-note">'+note+'</p>':'')+
+      '<div class="reslist">'+rows+'</div>'+
+      bottombar(true)+
+    '</div>';
   }
   function dtItem(icon,label,value){
     return '<div class="dt-item"><span class="material-symbols-outlined">'+icon+'</span>'+

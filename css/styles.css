@@ -120,13 +120,6 @@
   .nav-capsule:active {
     transform: scale(0.97);
   }
-  .winecard-glass-img {
-    width: 72px;
-    height: 96px;
-    object-fit: cover;
-    border-radius: 12px;
-    border: 1px solid var(--lineStrong);
-  }
   .food-img {
     width: 100%;
     height: 110px;
@@ -862,81 +855,135 @@
     padding: 28px;
     box-shadow: 0 6px 18px rgba(107,19,44,.03);
   }
-  .winecard {
+  /* ---------- Resultados (lista técnica) ---------- */
+  .results2 {
     width: 100%;
-    text-align: left;
-    background: var(--surface);
-    border: 1px solid var(--lineStrong);
-    border-radius: 20px;
-    padding: 22px;
+    max-width: 880px;
+    margin: 0 auto;
+  }
+  .reshead {
     display: flex;
-    align-items: center;
-    gap: 20px;
-    box-shadow: 0 4px 12px rgba(42,23,34,.03);
-    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    justify-content: space-between;
+    align-items: flex-end;
+    gap: 16px;
+    border-bottom: 1px solid var(--lineStrong);
+    padding-bottom: 12px;
   }
-  .winecard:hover {
-    transform: translateY(-2px);
-    border-color: var(--burgundy);
-    box-shadow: 0 10px 24px rgba(110,18,44,.08);
-  }
-  .winecard.top {
-    border-color: var(--gold);
-    border-width: 1.5px;
-    background: linear-gradient(180deg, #FFFFFF 0%, #FCFAF7 100%);
-  }
-  .winecard .bottle {
-    width: 80px;
-    min-width: 80px;
-    display: flex;
-    justify-content: center;
-  }
-  .winecard .nm {
-    font-family: var(--serif);
-    font-size: 22px;
-    line-height: 1.2;
+  .reshead-title {
+    font-family: 'Libre Caslon Text', serif;
+    font-size: 26px;
     font-weight: 700;
-    color: var(--claret);
+    color: var(--burgundy);
+    margin: 0;
+    line-height: 1.1;
   }
-  .winecard .meta {
+  .reshead-count {
+    font-size: 13px;
+    color: var(--inkSoft);
+    font-weight: 600;
+    white-space: nowrap;
+  }
+  .reshead-note {
     color: var(--inkSoft);
     font-size: 14px;
-    margin-top: 5px;
+    line-height: 1.45;
+    margin: 14px 0 0;
+  }
+  .reslist {
+    display: flex;
+    flex-direction: column;
+    margin-top: 8px;
+  }
+  .resrow {
+    display: grid;
+    grid-template-columns: 60px 1fr auto;
+    gap: 16px;
+    align-items: center;
+    width: 100%;
+    text-align: left;
+    padding: 16px 12px;
+    border-bottom: 1px solid var(--line);
+    background: transparent;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+  }
+  .resrow:hover { background: var(--paper2); }
+  .resrow.top { background: var(--roseTint); }
+  .resrow:active { transform: scale(0.995); }
+  .resrow-img {
+    width: 60px;
+    height: 76px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+    overflow: hidden;
+  }
+  .resrow-img svg { height: 64px; width: auto; }
+  .resrow-info {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    min-width: 0;
+  }
+  .resrow-head {
     display: flex;
     align-items: center;
     gap: 8px;
+    flex-wrap: wrap;
   }
-  .winecard .meta b {
-    color: var(--burgundy);
-    font-size: 16px;
+  .resrow-loc {
+    font-size: 10px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    font-weight: 700;
+    color: var(--gold);
+    background: var(--goldSoft);
+    padding: 2px 7px;
+    border-radius: 5px;
+    white-space: nowrap;
   }
-  .winecard .ph {
-    color: var(--inkSoft);
-    font-size: 14px;
-    margin-top: 10px;
-    line-height: 1.45;
+  .resrow-name {
+    font-family: 'Libre Caslon Text', serif;
+    font-size: 17px;
+    font-weight: 600;
+    color: var(--ink);
+    line-height: 1.2;
   }
-  .tag {
-    display: inline-block;
-    border-radius: 99px;
-    padding: 3px 12px;
-    font-size: 11px;
+  .resrow-top {
+    font-size: 10px;
     font-weight: 700;
     text-transform: uppercase;
-    letter-spacing: .05em;
-    background: var(--goldSoft);
-    color: var(--claret);
-    margin-bottom: 8px;
+    letter-spacing: 0.04em;
+    color: #fff;
+    background: var(--burgundy);
+    padding: 2px 8px;
+    border-radius: 99px;
+    white-space: nowrap;
   }
-  .note {
-    margin-top: 18px;
-    border-radius: 14px;
-    padding: 14px 18px;
-    background: var(--roseTint);
-    color: var(--claret);
-    font-size: 14px;
-    line-height: 1.5;
-    border-left: 3px solid var(--burgundy);
+  .resrow-grape {
+    font-size: 13px;
+    color: var(--inkSoft);
+  }
+  .resrow-desc {
+    font-size: 12px;
+    color: var(--inkSoft);
+    font-style: italic;
+    opacity: 0.8;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .resrow-price {
+    font-family: 'Libre Caslon Text', serif;
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--burgundy);
+    white-space: nowrap;
+    align-self: start;
+    padding-top: 2px;
   }
   .pairs {
     display: flex;
