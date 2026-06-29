@@ -15,6 +15,7 @@
   var OCCASIONS=["Jantar especial","Presente","Comemoração","Almoço em família / refeição casual","Quero experimentar algo novo"];
   var FOODS=["Churrasco","Aves","Carne vermelha","Peixes","Frutos do Mar","Massa com molho vermelho","Massa com molho branco","Risoto","Queijos","Comida japonesa","Salada","Aperitivos","Sobremesa"];
   var FOOD_ICON={"Churrasco":"🍖","Aves":"🍗","Carne vermelha":"🥩","Peixes":"🐟","Frutos do Mar":"🦐","Massa com molho vermelho":"🍝","Massa com molho branco":"🍜","Risoto":"🍚","Queijos":"🧀","Comida japonesa":"🍣","Salada":"🥗","Aperitivos":"🫒","Sobremesa":"🍰"};
+  var FOOD_MSICON={"Churrasco":"outdoor_grill","Aves":"skillet","Carne vermelha":"kebab_dining","Peixes":"set_meal","Frutos do Mar":"set_meal","Massa com molho vermelho":"dinner_dining","Massa com molho branco":"ramen_dining","Risoto":"rice_bowl","Queijos":"tapas","Comida japonesa":"ramen_dining","Salada":"eco","Aperitivos":"tapas","Sobremesa":"cake"};
   var FOOD_IMAGES={
     "Churrasco":"assets/imagens/comidas/churrasco.jpg",
     "Aves":"assets/imagens/comidas/aves.jpg",
@@ -540,8 +541,7 @@
   }
   function viewDetails(){
     var w=state.selected.wine;
-    var why=buildWhy(w,state.flow,state.food).map(function(t){return '<p>'+esc(t)+'</p>';}).join('');
-    var pairs=w.pairings.map(function(p){return '<span class="pair">'+FOOD_ICON[p.foodCategory]+' '+p.foodCategory+'</span>';}).join('');
+    var pairs=w.pairings.map(function(p){return '<span class="pair"><span class="material-symbols-outlined">'+(FOOD_MSICON[p.foodCategory]||'restaurant')+'</span>'+p.foodCategory+'</span>';}).join('');
     var t=w.taste||{fruit:0,sugar:0,acidity:0,tannin:0};
     var found=COUNTRIES.find(function(c){return c.name.toLowerCase()===w.country.toLowerCase();});
     var flagURL='assets/imagens/bandeiras/'+(found?found.code:'br')+'.png';
@@ -580,34 +580,10 @@
           grid+
           taste+
           (pairs?'<div class="dt-pairs-block">'+eyebrow('Harmoniza bem com')+'<div class="pairs">'+pairs+'</div></div>':'')+
-          '<div class="why"><h4>Por que recomendamos</h4>'+why+'</div>'+
         '</section>'+
       '</div>'+
       bottombar(true)+
     '</div>';
-  }
-  function listToPt(arr){
-    if(arr.length===0)return "";
-    if(arr.length===1)return arr[0];
-    if(arr.length===2)return arr[0]+" e "+arr[1];
-    return arr.slice(0,-1).join(", ")+" e "+arr[arr.length-1];
-  }
-  function buildWhy(w,flow,food){
-    var paras=[], i;
-    if(w.profileReason)paras.push(w.profileReason);
-    if(flow==="food"){
-      for(i=0;i<w.pairings.length;i++){ if(w.pairings[i].foodCategory===food && w.pairings[i].pairingReason){ paras.push(w.pairings[i].pairingReason); break; } }
-    }
-    var sweet = w.perceivedSweetness==="Seco" ? "É um vinho seco, com pouca sensação de doçura"
-      : w.perceivedSweetness==="Meio seco" ? "É um vinho meio seco, com um leve toque adocicado"
-      : w.perceivedSweetness==="Doce" ? "É um vinho doce, indicado para quem gosta de mais doçura"
-      : "É um vinho suave, levemente adocicado e fácil de gostar";
-    paras.push(sweet + (w.servingTemperature ? (", e fica melhor servido em torno de "+w.servingTemperature+".") : "."));
-    var prim=[];
-    for(i=0;i<w.pairings.length;i++){ var p=w.pairings[i];
-      if(p.level==="primary" && !(flow==="food" && p.foodCategory===food)) prim.push(p.foodCategory.toLowerCase()); }
-    if(prim.length)paras.push("Combina especialmente bem com "+listToPt(prim)+".");
-    return paras;
   }
 
   /* ---------- Aprender ---------- */

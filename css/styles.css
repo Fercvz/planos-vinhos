@@ -945,37 +945,18 @@
   }
   .pair {
     border-radius: 99px;
-    padding: 6px 14px;
+    padding: 6px 14px 6px 10px;
     font-size: 13px;
     font-weight: 500;
     background: var(--paper2);
     color: var(--ink);
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 6px;
   }
-  .why {
-    margin-top: 24px;
-    border-radius: 18px;
-    padding: 22px;
-    background: var(--roseTint);
-    border: 1px dashed var(--rose);
-  }
-  .why h4 {
-    font-family: var(--serif);
-    font-size: 19px;
-    color: var(--claret);
-    margin: 0 0 8px;
-    font-weight: 700;
-  }
-  .why p {
-    color: var(--ink);
-    font-size: 15px;
-    line-height: 1.55;
-    margin: 0;
-  }
-  .why p+p {
-    margin-top: 10px;
+  .pair .material-symbols-outlined {
+    font-size: 18px;
+    color: var(--burgundy);
   }
   .fields {
     display: grid;
