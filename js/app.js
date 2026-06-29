@@ -302,30 +302,35 @@
       '<button class="nav-capsule" data-action="home">'+ic('home')+' Tela inicial</button>'+
       '</div>';
   }
-  function progress(step){
-    var labels=["Sua escolha está 25% pronta","Sua escolha está 50% pronta","Sua escolha está 75% pronta","Sua escolha está quase pronta"];
+  function qProgress(step){
     var pct=[25,50,75,95][step-1];
-    return '<div class="progress"><div class="row"><span class="lab">'+labels[step-1]+'</span><span class="num">Pergunta '+step+' de 4</span></div>'+
-      '<div class="bar"><div style="width:'+pct+'%"></div></div></div>';
+    return '<div class="q-progress">'+
+      '<div class="q-progress-track"><div class="q-progress-fill" style="width:'+pct+'%"></div></div>'+
+      '<div class="q-progress-row"><span class="q-progress-label">Sua jornada</span><span class="q-progress-pct">'+pct+'%</span></div>'+
+    '</div>';
   }
-  function choice(o,selected){
-    var media = '';
-    if(o.iconImg) {
-      media = '<img class="choice-img" src="'+o.iconImg+'" alt="'+esc(o.label)+'">';
-    } else if(o.icon) {
-      media = '<span class="ico">'+o.icon+'</span>';
-    }
-    return '<button class="choice'+(selected?' sel':'')+'" data-action="answer" data-key="'+o.key+'" data-val="'+esc(o.v)+'" data-next="'+o.next+'">'+
-      media +
-      '<span style="flex:1"><span class="ttl">'+o.label+'</span>'+(o.desc?'<span class="desc">'+o.desc+'</span>':'')+'</span>'+
-      (selected?'<span class="tick">'+ic('check')+'</span>':'')+'</button>';
+  function qFooter(){
+    return '<footer class="q-footer">'+
+      '<button class="q-foot-btn" data-action="back"><span class="material-symbols-outlined">arrow_back</span><span class="q-foot-label">Voltar</span></button>'+
+      '<button class="q-foot-btn" data-action="home"><span class="material-symbols-outlined">restart_alt</span><span class="q-foot-label">Reiniciar</span></button>'+
+    '</footer>';
   }
-  function questionScreen(step,title,hint,opts,extra){
-    var sel=state.answers[opts[0]?opts[0].key:''];
-    var body=opts.map(function(o){return choice(o, state.answers[o.key]===o.v);}).join('');
-    if(extra)body+='<button class="dash" data-action="answer" data-key="'+extra.key+'" data-val="'+esc(extra.v)+'" data-next="'+extra.next+'">'+extra.label+'</button>';
-    return '<div class="wrap">'+progress(step)+'<h1 class="qtitle">'+title+'</h1>'+(hint?'<p class="hint">'+hint+'</p>':'')+
-      '<div class="stack" style="margin-top:16px">'+body+'</div>'+bottombar(true)+'</div>';
+  function qcard(o){
+    return '<button class="qcard" data-action="answer" data-key="'+o.key+'" data-val="'+esc(o.v)+'" data-next="'+o.next+'">'+
+      '<span class="qcard-badge"><span class="material-symbols-outlined">'+o.icon+'</span></span>'+
+      '<span class="qcard-title">'+o.label+'</span>'+
+      (o.desc?'<span class="qcard-desc">'+o.desc+'</span>':'')+
+    '</button>';
+  }
+  function questionScreen(step,title,subtitle,opts,extra){
+    var cards=opts.map(qcard).join('');
+    var skip=extra?'<button class="qskip" data-action="answer" data-key="'+extra.key+'" data-val="'+esc(extra.v)+'" data-next="'+extra.next+'"><span class="material-symbols-outlined">skip_next</span>'+extra.label+'</button>':'';
+    return qProgress(step)+
+      '<main class="q-main"><div class="q-inner">'+
+        '<div class="q-head"><h2 class="q-title">'+title+'</h2>'+(subtitle?'<p class="q-sub">'+subtitle+'</p>':'')+'</div>'+
+        '<div class="qgrid">'+cards+'</div>'+skip+
+      '</div></main>'+
+      qFooter();
   }
 
   /* ---------- Telas ---------- */
@@ -350,94 +355,34 @@
     '</main>';
   }
   function viewQ1(){
-    return '<main class="q1-main">'+
-      '<!-- Progress Header Section -->'+
-      '<div class="q1-progress-section">'+
-        '<div style="margin-bottom:8px">'+
-          '<p class="q1-progress-label">Sua escolha está 25% pronta</p>'+
-          '<div class="q1-progress-bar">'+
-            '<div class="q1-progress-fill"></div>'+
-          '</div>'+
-          '<p class="q1-progress-sub">Pergunta 1 de 4</p>'+
+    var TIPOS=[
+      {v:"Tinto",img:"tipo-tinto",name:"Tinto",desc:"Encorpados, complexos e com taninos presentes."},
+      {v:"Branco",img:"tipo-branco",name:"Branco",desc:"Frescos, aromáticos e vibrantes."},
+      {v:"Rosé",img:"tipo-rose",name:"Rosé",desc:"Leves, frutados e ideais para momentos descontraídos."},
+      {v:"Espumante",img:"tipo-espumante",name:"Espumante",desc:"Festivos, refrescantes e com perlage persistente."}
+    ];
+    var cards=TIPOS.map(function(c){
+      return '<button class="wine-card" data-action="answer" data-key="type" data-val="'+c.v+'" data-next="q2">'+
+        '<div class="wine-card-img-wrapper">'+
+          '<div class="wine-card-img" style="background-image: url(\'assets/imagens/tipos/'+c.img+'.jpg\')"></div>'+
+          '<div class="wine-card-scrim"></div>'+
         '</div>'+
-        '<h2 class="q1-title">Que tipo de vinho você procura?</h2>'+
-      '</div>'+
-      '<!-- Wine Grid -->'+
-      '<div class="q1-grid">'+
-        '<!-- Tinto -->'+
-        '<button class="wine-card" data-action="answer" data-key="type" data-val="Tinto" data-next="q2">'+
-          '<div class="wine-card-img-wrapper">'+
-            '<div class="wine-card-img" style="background-image: url(\'assets/imagens/tipos/tipo-tinto.jpg\')"></div>'+
-            '<div class="wine-card-scrim"></div>'+
-          '</div>'+
-          '<div class="wine-card-body">'+
-            '<div>'+
-              '<h3 class="wine-card-name">Tinto</h3>'+
-              '<p class="wine-card-desc">Encorpados, complexos e com taninos presentes.</p>'+
-            '</div>'+
-            '<span class="wine-card-arrow">arrow_forward</span>'+
-          '</div>'+
+        '<div class="wine-card-body">'+
+          '<div><h3 class="wine-card-name">'+c.name+'</h3><p class="wine-card-desc">'+c.desc+'</p></div>'+
+          '<span class="wine-card-arrow">arrow_forward</span>'+
+        '</div>'+
+      '</button>';
+    }).join('');
+    return qProgress(1)+
+      '<main class="q1-main">'+
+        '<div class="q-head"><h2 class="q-title">Que tipo de vinho você procura?</h2>'+
+          '<p class="q-sub">Escolha o tipo que combina com o seu momento.</p></div>'+
+        '<div class="q1-grid">'+cards+'</div>'+
+        '<button class="q1-skip-btn" data-action="answer" data-key="type" data-val="nao_sei" data-next="q2">'+
+          '<span class="material-symbols-outlined">help_outline</span>Não sei, quero ajuda'+
         '</button>'+
-        '<!-- Branco -->'+
-        '<button class="wine-card" data-action="answer" data-key="type" data-val="Branco" data-next="q2">'+
-          '<div class="wine-card-img-wrapper">'+
-            '<div class="wine-card-img" style="background-image: url(\'assets/imagens/tipos/tipo-branco.jpg\')"></div>'+
-            '<div class="wine-card-scrim"></div>'+
-          '</div>'+
-          '<div class="wine-card-body">'+
-            '<div>'+
-              '<h3 class="wine-card-name">Branco</h3>'+
-              '<p class="wine-card-desc">Frescos, aromáticos e vibrantes.</p>'+
-            '</div>'+
-            '<span class="wine-card-arrow">arrow_forward</span>'+
-          '</div>'+
-        '</button>'+
-        '<!-- Rosé -->'+
-        '<button class="wine-card" data-action="answer" data-key="type" data-val="Rosé" data-next="q2">'+
-          '<div class="wine-card-img-wrapper">'+
-            '<div class="wine-card-img" style="background-image: url(\'assets/imagens/tipos/tipo-rose.jpg\')"></div>'+
-            '<div class="wine-card-scrim"></div>'+
-          '</div>'+
-          '<div class="wine-card-body">'+
-            '<div>'+
-              '<h3 class="wine-card-name">Rosé</h3>'+
-              '<p class="wine-card-desc">Leves, frutados e ideais para momentos descontraídos.</p>'+
-            '</div>'+
-            '<span class="wine-card-arrow">arrow_forward</span>'+
-          '</div>'+
-        '</button>'+
-        '<!-- Espumante -->'+
-        '<button class="wine-card" data-action="answer" data-key="type" data-val="Espumante" data-next="q2">'+
-          '<div class="wine-card-img-wrapper">'+
-            '<div class="wine-card-img" style="background-image: url(\'assets/imagens/tipos/tipo-espumante.jpg\')"></div>'+
-            '<div class="wine-card-scrim"></div>'+
-          '</div>'+
-          '<div class="wine-card-body">'+
-            '<div>'+
-              '<h3 class="wine-card-name">Espumante</h3>'+
-              '<p class="wine-card-desc">Festivos, refrescantes e com perlage persistente.</p>'+
-            '</div>'+
-            '<span class="wine-card-arrow">arrow_forward</span>'+
-          '</div>'+
-        '</button>'+
-      '</div>'+
-      '<!-- Secondary Option -->'+
-      '<button class="q1-skip-btn" data-action="answer" data-key="type" data-val="nao_sei" data-next="q2">'+
-        'Não sei, quero ajuda'+
-        '<span class="material-symbols-outlined">help_outline</span>'+
-      '</button>'+
-    '</main>'+
-    '<!-- Fixed Bottom Navigation -->'+
-    '<footer class="path-footer" style="height:96px; padding:0 48px; box-shadow: 0 -4px 20px rgba(0,0,0,0.04)">'+
-      '<button class="path-footer-btn" style="border: 1px solid #565e74; padding: 12px 24px; border-radius: 9999px;" data-action="back">'+
-        '<span class="material-symbols-outlined" style="margin-right:8px">arrow_back</span>'+
-        '<span class="path-footer-btn-text" style="color:#565e74">Voltar</span>'+
-      '</button>'+
-      '<button class="path-footer-btn" data-action="home">'+
-        '<span class="material-symbols-outlined" style="margin-right:8px">home</span>'+
-        '<span class="path-footer-btn-text" style="color:#565e74">Tela Inicial</span>'+
-      '</button>'+
-    '</footer>';
+      '</main>'+
+      qFooter();
   }
   function viewBlock(){
     return '<div class="wrap"><div class="card center">'+
@@ -898,23 +843,23 @@
       case "block": return viewBlock();
       case "path": return viewPath();
       case "q1": return viewQ1();
-      case "q2": return questionScreen(2,"Qual a faixa de preço que você está buscando?",null,[
-        {key:"price",v:"Econômico",label:"Econômico",desc:"Até R$ 50,00",next:"q3"},
-        {key:"price",v:"Intermediário",label:"Intermediário",desc:"R$ 50,00 até R$ 100,00",next:"q3"},
-        {key:"price",v:"Premium",label:"Premium",desc:"Acima de R$ 100,00",next:"q3"},
-        {key:"price",v:"tanto_faz",label:"Estou aberto a sugestões",next:"q3"}
+      case "q2": return questionScreen(2,"Qual o investimento pretendido?","Selecione a faixa de preço que melhor se adapta à ocasião.",[
+        {key:"price",v:"Econômico",icon:"payments",label:"Econômico",desc:"Até R$ 50",next:"q3"},
+        {key:"price",v:"Intermediário",icon:"savings",label:"Intermediário",desc:"R$ 50 – R$ 100",next:"q3"},
+        {key:"price",v:"Premium",icon:"diamond",label:"Premium",desc:"Acima de R$ 100",next:"q3"},
+        {key:"price",v:"tanto_faz",icon:"auto_awesome",label:"Estou aberto a sugestões",desc:"Deixe o sommelier decidir",next:"q3"}
       ]);
-      case "q3": return questionScreen(3,"Você prefere um vinho com qual estilo?",null,[
-        {key:"profile",v:"Leve",label:"Leve e suave",next:"q4"},
-        {key:"profile",v:"Equilibrado",label:"Equilibrado",next:"q4"},
-        {key:"profile",v:"Intenso",label:"Encorpado e marcante",next:"q4"},
-        {key:"profile",v:"nao_sei",label:"Não sei",next:"q4"}
+      case "q3": return questionScreen(3,"Qual estilo você prefere?","Escolha o perfil que mais combina com o seu paladar.",[
+        {key:"profile",v:"Leve",icon:"water_drop",label:"Leve e suave",desc:"Macio e fácil de beber",next:"q4"},
+        {key:"profile",v:"Equilibrado",icon:"balance",label:"Equilibrado",desc:"Um meio-termo versátil",next:"q4"},
+        {key:"profile",v:"Intenso",icon:"local_fire_department",label:"Encorpado e marcante",desc:"Corpo e personalidade",next:"q4"},
+        {key:"profile",v:"nao_sei",icon:"help",label:"Não sei",desc:"Deixe o sommelier decidir",next:"q4"}
       ]);
-      case "q4": return questionScreen(4,"Qual é a ocasião?","Esta pergunta é opcional.",[
-        {key:"occasion",v:"Jantar especial",label:"Refeição especial",iconImg:"assets/imagens/comidas/carne-vermelha.jpg",next:"processing"},
-        {key:"occasion",v:"Presente",label:"Presente",iconImg:"assets/imagens/ocasioes/presente.jpg",next:"processing"},
-        {key:"occasion",v:"Comemoração",label:"Celebração",iconImg:"assets/imagens/ocasioes/comemoracao.jpg",next:"processing"},
-        {key:"occasion",v:"Almoço em família / refeição casual",label:"Relaxar em casa",iconImg:"assets/imagens/tacas/taca-tinto.jpg",next:"processing"}
+      case "q4": return questionScreen(4,"Qual é a ocasião?","Esta etapa é opcional, mas ajuda a refinar a escolha.",[
+        {key:"occasion",v:"Jantar especial",icon:"restaurant",label:"Refeição especial",desc:"Um jantar à altura",next:"processing"},
+        {key:"occasion",v:"Presente",icon:"card_giftcard",label:"Presente",desc:"Para presentear bem",next:"processing"},
+        {key:"occasion",v:"Comemoração",icon:"celebration",label:"Celebração",desc:"Hora de comemorar",next:"processing"},
+        {key:"occasion",v:"Almoço em família / refeição casual",icon:"weekend",label:"Relaxar em casa",desc:"Um momento descontraído",next:"processing"}
       ],{key:"occasion",v:"nao_sei",label:"Pular esta pergunta",next:"processing"});
       case "food": return viewFood();
       case "country": return viewCountry();
@@ -930,7 +875,7 @@
   }
   function chrome(inner){
     var isAge = (state.screen === "age");
-    var isPath = (state.screen === "path" || state.screen === "q1");
+    var isPath = (state.screen === "path" || state.screen === "q1" || state.screen === "q2" || state.screen === "q3" || state.screen === "q4");
     var brand=(state.screen!=="admin" && state.screen!=="admin_auth" && !isAge)?
       '<div class="brand-bar"><img class="brand-logo" src="assets/imagens/logo/planos.jpg" alt="Planos Supermercados Logo"></div>':'';
     var gear=isAge?'<button class="gear" title="Área administrativa" data-action="gear">⚙️</button>':'';
