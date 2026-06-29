@@ -1,0 +1,11 @@
+# Fotos de referência (concorrente) — não publicar
+referencias/
+
+# Configurações locais de ferramentas
+.claude/
+
+# Lixo de sistema operacional
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+.DS_Store
