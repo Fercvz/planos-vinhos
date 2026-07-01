@@ -855,7 +855,7 @@
     var isAge = (state.screen === "age");
     var isPath = (state.screen === "path" || state.screen === "q1" || state.screen === "q2" || state.screen === "q3" || state.screen === "q4");
     var brand=(state.screen!=="admin" && state.screen!=="admin_auth" && !isAge)?
-      '<div class="brand-bar"><img class="brand-logo" src="assets/imagens/logo/planos.jpg" alt="Planos Supermercados Logo"></div>':'';
+      '<div class="brand-bar"><img class="brand-logo" src="assets/imagens/logo/logo_mercado.jpg" alt="Planos Supermercados Logo"></div>':'';
     var gear=isAge?'<button class="gear" title="Área administrativa" data-action="gear">⚙️</button>':'';
     var appClass = isAge ? 'app welcome-active' : (isPath ? 'app path-active' : 'app');
     return '<div class="'+appClass+'">'+brand+'<div class="stage">'+inner+'</div>'+gear+'</div>';
