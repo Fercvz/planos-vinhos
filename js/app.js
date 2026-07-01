@@ -359,7 +359,7 @@
       '</div>'+
       '<section class="welcome-section">'+
         '<div class="welcome-card">'+
-          '<p class="welcome-eyebrow">Planos Supermercados</p>'+
+          '<p class="welcome-eyebrow">Supermercados</p>'+
           '<h1 class="welcome-title">Encontre o vinho perfeito para cada momento</h1>'+
           '<p class="welcome-subtitle">Você tem 18 anos ou mais?</p>'+
           '<div class="welcome-buttons">'+
